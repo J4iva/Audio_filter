@@ -20,18 +20,18 @@ struct WAV_Header{
 };
 
 struct WAV_Sample{
-    vector<double> time;
-    vector<short> amplitude;
+    double time;
+    short amplitude;
 };
 
-void read(string& file_name, int& number, WAV_Header& header, int& num_samples, WAV_Sample& sample);
-int menu(string& file_name, WAV_Header& header, int& num_samples, WAV_Sample& sample);
-void display(WAV_Sample sample);
+void read(string& file_name, int& number, WAV_Header& header, int& num_samples, vector<WAV_Sample>& sample);
+int menu(string& file_name, WAV_Header& header, int& num_samples, vector<WAV_Sample>& sample);
+void display(vector<WAV_Sample> sample);
 
 
 
 int main(){
-    WAV_Sample sample;
+    vector<WAV_Sample> sample;
     string file_name;
     WAV_Header header;
     int num_samples;
@@ -40,7 +40,7 @@ int main(){
 
 }
 
-int menu(string& file_name, WAV_Header& header, int& num_samples, WAV_Sample& sample){
+int menu(string& file_name, WAV_Header& header, int& num_samples, vector<WAV_Sample>& sample){
     int number = 1;
 
     while (number != 0){
@@ -65,7 +65,7 @@ int menu(string& file_name, WAV_Header& header, int& num_samples, WAV_Sample& sa
         cout << endl << "HEADER INFO: " << endl;
         cout << "Sample rate: " << header.sample_rate << " Hz." << endl;
         cout << "Number of samples: " << num_samples << endl;
-        cout << "Length of the audio: " << sample.time.back()/1000 << " s" << endl;
+        cout << "Length of the audio: " << sample.back().time/1000 << " s" << endl;
         display(sample);
         break;
     case 404:
@@ -80,7 +80,7 @@ int menu(string& file_name, WAV_Header& header, int& num_samples, WAV_Sample& sa
 
 
 
-void read(string& file_name, int& number, WAV_Header& header, int& num_samples, WAV_Sample& sample){
+void read(string& file_name, int& number, WAV_Header& header, int& num_samples, vector<WAV_Sample>& sample){
     vector<short> temp_sample; //Used to read the samples directly, this could cause an error so keep track, (J4iva).
     bool okay = true;
 
@@ -113,8 +113,10 @@ void read(string& file_name, int& number, WAV_Header& header, int& num_samples, 
      file.close();
 
     for (int i = 0; i < num_samples; i++){
-        sample.amplitude.push_back(temp_sample[i]);
-        sample.time.push_back((i*1000)/header.sample_rate);
+        WAV_Sample current_sample;
+        current_sample.amplitude = temp_sample[i];
+        current_sample.time = (i*1000)/header.sample_rate;
+        sample.push_back(current_sample);
     }
 
     if (okay == true){
@@ -123,11 +125,11 @@ void read(string& file_name, int& number, WAV_Header& header, int& num_samples, 
     
 }
 
-void display(WAV_Sample sample){
+void display(vector<WAV_Sample> sample){
     cout << endl << "SAMPLE DISPLAY: " << endl << endl;
 
-    for (int i = 0; i < sample.amplitude.size(); i++) {  
-        cout << i << "Time: " << sample.time[i] << " ms, Amplitude: " << sample.amplitude[i] << endl; //Time is in ms, if want to change aksi change how time is "created" at the last for of read(), (J4iva).
+    for (int i = 0; i < sample.size(); i++) {  
+        cout << i << "Time: " << sample[i].time << " ms, Amplitude: " << sample[i].amplitude << endl; //Time is in ms, if want to change aksi change how time is "created" at the last for of read(), (J4iva).
     }
 
 }
