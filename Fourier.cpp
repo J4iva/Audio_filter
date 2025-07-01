@@ -18,7 +18,7 @@ struct WAV_Header{
     unsigned int data_size; //size of the next data, the sample data.
 };
 
-const int MAX_SAMPLES = 1000000;
+const int MAX_SAMPLES = 1000;
 typedef short Tsampledata[MAX_SAMPLES];
 
 bool read(WAV_Header header, string file_name, bool open, int num_samples, Tsampledata sample_data);
@@ -43,24 +43,61 @@ int main(){
     while (open == false){
     cout << "Insert the file location here: ";
     getline(cin, file_name);
-    read(header, file_name, open, num_samples, sample_data);
+
+
+     open = true;
+    ifstream file(file_name, ios::binary);
+
+    if (!file){
+        cout << endl << "File cannot be open!!" << endl;
+        open = false;
     }
+
+    file.read(reinterpret_cast<char*>(&header), sizeof(WAV_Header)); // Making the first part of the binary fit the strcut. 
+
+   
+    if (header.bits_per_sample != 16 || header.channels != 1 || header.format_type != 1){
+        cout << endl << "Unsupported WAV file format or not WAV file. Use .wav 16-bit mono PCM" << endl;
+        open = false;
+    }
+
+    
+
+    num_samples = header.data_size / (2);
+    /*if (num_samples > MAX_SAMPLES){
+        cout << endl << "The audio file is very long! Upload a shorter one or increase MAX_SAMPLES." << endl; //dev only
+        return 0;
+    }*/
+
+    file.read(reinterpret_cast<char*>(sample_data), num_samples * sizeof(Tsampledata)); //This part of the binary is the sample data.
+    file.close();
+    
+     cout << "here" << endl;
+    
+    for (int i = 0; i < 1000; i++){
+        samples[i].amplitude = sample_data[i];
+        samples[i].time_ms = (i*1000.0) / header.sample_rate;
+    }  //This for loop is filling all the data in the struct "samples". We should change the 1000.0 if we want to increase the number of samples, as well as the num_samples etc.
+    
+    }
+    
+
 
     open = false;
 
-    num_samples = header.data_size / (header.bits_per_sample / 8);
-    if (num_samples > MAX_SAMPLES){
+    
+    /*if (num_samples > MAX_SAMPLES){
         cout << endl << "The audio file is very long! Upload a shorter one or increase MAX_SAMPLES." << endl; //dev only
         return 0;
-    }
+    }*/
 
     
     
-
+    
 
     //output demo onñly first 100
-    for (int i = 0; i < 100 && i < num_samples; i++) {  
-        cout << "Time: " << samples[i].time_ms << " ms, Amplitude: " << samples[i].amplitude << endl;
+    for (int i = 0; i < 100; i++) {  
+        cout << i << "Time: " << samples[i].time_ms << " ms, Amplitude: " << samples[i].amplitude << endl;
     }
 
     return 0;
@@ -68,7 +105,7 @@ int main(){
 
 }
 
-bool read(WAV_Header header, string file_name, bool open, int num_samples, Tsampledata sample_data){
+/* bool read(WAV_Header header, string file_name, bool open, int num_samples, Tsampledata sample_data){
     open = true;
     ifstream file(file_name, ios::binary);
 
@@ -86,19 +123,23 @@ bool read(WAV_Header header, string file_name, bool open, int num_samples, Tsamp
 
     
 
-    num_samples = header.data_size / (header.bits_per_sample / 8);
-    /*if (num_samples > MAX_SAMPLES){
+    num_samples = header.data_size / (2);
+    if (num_samples > MAX_SAMPLES){
         cout << endl << "The audio file is very long! Upload a shorter one or increase MAX_SAMPLES." << endl; //dev only
         return 0;
-    }*/
+    }
 
     file.read(reinterpret_cast<char*>(sample_data), num_samples * sizeof(Tsampledata)); //This part of the binary is the sample data.
     file.close();
-
-    for (int i = 0; i < num_samples; i++){
+    
+    
+    
+    for (int i = 0; i < 1000; i++){
         samples[i].amplitude = sample_data[i];
         samples[i].time_ms = (i*1000.0) / header.sample_rate;
     }  //This for loop is filling all the data in the struct "samples". We should change the 1000.0 if we want to increase the number of samples, as well as the num_samples etc.
     
+     
+    
     return open;
-}
+}*/
