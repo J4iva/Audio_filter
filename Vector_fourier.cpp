@@ -1,7 +1,14 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <complex>
+
+
+
 using namespace std;
+
+const double E = 2.71828182845904523536;
+
 
 struct WAV_Header{
     char riff[4]; ////Always RIFF if it's a .wav audio, we can use this to compare and let the file pass as media.
@@ -27,6 +34,7 @@ struct WAV_Sample{
 void read(string& file_name, int& number, WAV_Header& header, int& num_samples, vector<WAV_Sample>& sample);
 int menu(string& file_name, WAV_Header& header, int& num_samples, vector<WAV_Sample>& sample);
 void display(vector<WAV_Sample> sample);
+void semi_fourier(vector<WAV_Sample> sample, int num_samples);
 
 
 
@@ -67,6 +75,8 @@ int menu(string& file_name, WAV_Header& header, int& num_samples, vector<WAV_Sam
         cout << "Number of samples: " << num_samples << endl;
         cout << "Length of the audio: " << sample.back().time/1000 << " s" << endl;
         display(sample);
+        semi_fourier(sample, num_samples); //This function is producing a core dumped, must debug, (J4iva).
+
         break;
     case 404:
         cout << endl << "An error ocurred, going back to the menu..." << endl;
@@ -86,7 +96,7 @@ void read(string& file_name, int& number, WAV_Header& header, int& num_samples, 
 
     cout <<  endl << "Insert the file location here: ";
     cin.ignore();
-    getline(cin, file_name); //Name of the file for me /home/jaiva/Downloads/01-440-sine-3s-mono.wav , (J4iva).
+    getline(cin, file_name); //Name of the file for me /home/jaiva/Audio_filter/test-3s-mono.wav , (J4iva).
 
     ifstream file(file_name, ios::binary);
 
@@ -130,6 +140,26 @@ void display(vector<WAV_Sample> sample){
 
     for (int i = 0; i < sample.size(); i++) {  
         cout << i << "Time: " << sample[i].time << " ms, Amplitude: " << sample[i].amplitude << endl; //Time is in ms, if want to change aksi change how time is "created" at the last for of read(), (J4iva).
+    }
+
+    cout << endl << endl;
+
+}
+
+void semi_fourier(vector<WAV_Sample> sample, int num_samples){ //This function is producing a core dumped, must debug, (J4iva).
+    
+    vector<WAV_Sample> sample_trans;
+
+    for (int i = 0; i < sample.size(); i++){
+        complex<double> pow_complex (0, -2*M_PI*(1/10)*sample[i].time); // generating the complex number, real part is 0 in the fourier trans. M_PI is a long doube of pi, (J4iva).
+
+        sample_trans[i].amplitude = sample[i].amplitude * pow(E, imag(pow_complex)); // imag() refer to the imaginary part of the variable inside (part of complex library), sample_trans[i].amplitude = g(t_k)*e^(-2pi*f*t_k*i) , (J4iva).
+        sample_trans[i].time = sample[i].time;
+   
+    }
+
+    for (int i = 0; i < sample_trans.size(); i++){
+        cout << i << "Time: " << sample_trans[i].time << "ms, Amplitude: " << sample_trans[i].amplitude << endl;
     }
 
 }
