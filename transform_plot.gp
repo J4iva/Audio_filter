@@ -1,0 +1,5 @@
+set title 'Semi-Fourier Transform' 
+set xlabel 'Frequency'
+set ylabel 'Magnitude'
+plot 'wav_graph_transformed.dat' with lines title 'Semi-Fourier Transform'
+pause -1 'Press any key to exit...'

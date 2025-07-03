@@ -1,0 +1,5 @@
+set title 'Audio Samples' 
+set xlabel 'Time (ms)'
+set ylabel 'Amplitude'
+plot 'wav_graph.dat' with lines title 'Audio Signal'
+pause -1 'Press any key to exit...'
