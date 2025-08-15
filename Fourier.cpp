@@ -118,12 +118,12 @@ bool leerWav(const string& archivo, vector<float>& mono, unsigned int& sample_ra
         return false;
     }
 
-    //a wav is a list of chunks (id + size + content), so we walk them instead of trusting a fixed 44 bytes header
+    //a wav is a list of chunks (id + size + content)
     Format fmt = {};
     Chunk chunk;
     while (file.read(reinterpret_cast<char*>(&chunk), sizeof(Chunk))){
         string id(chunk.id, 4);
-        int relleno = chunk.size % 2; //chunks are padded to even size
+        int relleno = chunk.size % 2; //chunks padded even
         if (id == "fmt "){
             if (chunk.size < sizeof(Format)){
                 cerr << "Broken fmt chunk" << endl;
